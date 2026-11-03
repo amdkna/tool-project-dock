@@ -1,45 +1,29 @@
-# Development and release guide
+# Development guide
 
-## Requirements
-Windows 10/11, Go 1.22+, Git for Windows and configured Git credentials. An internet connection is needed to fetch Go modules on first build.
+## Build
 
-## Build from PowerShell
+Windows 10/11, Go 1.22+ and Git for Windows required.
 
 ```powershell
 cd 'C:\devs\Tools\dev\project-dock'
 git pull origin main
-.\scripts\build.ps1
-```
-
-To build and open the program:
-
-```powershell
 .\scripts\build.ps1 -Run
 ```
 
-This script checks that Go is installed, runs `go mod tidy`, creates `dist` and compiles a GUI executable into `dist/dock.exe`. It reports failures without silently treating a failed build as successful. The first build requires internet access for Go dependencies. The generated `go.sum` file should be committed once dependencies are resolved.
+Compiles `dist/dock.exe`. First run creates `dist/config.toml`, which is gitignored.
 
-## Usage
-1. Launch Dock.
-2. Select **File > Config...** (opens the per-executable `config.toml` in Notepad).
-3. Change `project.directory` to an **existing Git clone**; use TOML literal strings for Windows paths: `directory = 'C:\devs\my-project'`.
-4. Set `git.remote` (typically `origin`) and `git.branch` (typically `main`).
-5. Save the file, click PULL or PUSH and inspect the activity log.
+## Configuration
 
-PULL executes `git -C <directory> pull --ff-only <remote> <branch>` and refuses non-fast-forward merges. PUSH executes `git -C <directory> push <remote> <branch>` and transfers existing commits only; it does **not** stage or commit files. No force-push is provided. Git terminal prompting is disabled; authenticate using Git for Windows first.
+The sample `config.example.toml` is tracked. Use TOML `[[repositories]]` blocks, with `name`, `url`, `directory`, `branch`, and optional `remote` (default `origin`). The app validates required fields and rejects duplicate local directories and unknown config keys. Use single quotes for Windows paths to avoid escaping backslashes.
 
-## Limitations of 0.1.2
-- A local cloned repository must already exist. Clone and project preview are not implemented.
-- Git output is displayed **after the command completes**, not streamed live.
-- One command at a time per instance; separate instances should have separate executable directories and should not operate simultaneously on one Git working tree.
-- The app creates `config.toml` beside its executable. That directory must be writable.
-- Go module dependencies have not been built in the authoring environment; test the Windows build before treating this as a release.
+**Migration from 0.1.2:** replace the old `[project]` and `[git]` sections with one or more `[[repositories]]` blocks. Set the URL to match `git remote get-url origin`. Config is read on startup and on **File > Refresh**; invalid config leaves previous rows unchanged.
+
+## Git safety / limits
+
+Each row's buttons operate on the configured local Git clone. The app validates that the remote URL matches configuration, then runs `git pull --ff-only` or `git push`. It never commits, forces a push or runs clone. Only one Git operation can run per Dock instance. No protection against different instances using the same local working directory.
+
+Live output is not streamed; the completed command's output is shown in logs. No web preview, managed development server or project cloning yet. Large lists have no dedicated scrolling area in this version. Windows compilation could not be tested in the authoring environment.
 
 ## Versioning
-- `x=0` until an explicit main-version change.
-- `y=1` until the owner explicitly requests another upgrade series.
-- Increment `z` for each new published app change (0–999).
-- Update the source version in `cmd/dock/main_windows.go`, README and changelog together **before pushing**. No automatic bump currently exists.
 
-## Why TOML?
-TOML is readable and supports comments and organized sections. It is less indentation-sensitive than YAML and more comfortable to hand-edit than JSON. Validate fields on load and avoid putting credentials in it. Relative paths are resolved against the config directory.
+`x.y.z`: x=0 until explicitly changed, y=1 until owner requests otherwise, z increments with each application update (up to 999). Keep source version, changelog and README synchronized.

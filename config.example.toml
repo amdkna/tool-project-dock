@@ -1,8 +1,15 @@
-# Generated as config.toml next to dock.exe on first run.
-[project]
-name = "My Project"
-directory = "./workspace"
-
-[git]
-remote = "origin"
+# Dock by Webigram sample configuration. Save as dist/config.toml.
+# Use single-quoted Windows paths. Each block creates one repository row.
+[[repositories]]
+name = "Website"
+url = "https://github.com/example/website.git"
+directory = 'C:\devs\website'
 branch = "main"
+remote = "origin"
+
+[[repositories]]
+name = "API"
+url = "https://github.com/example/api.git"
+directory = 'C:\devs\api'
+branch = "dev"
+remote = "origin"

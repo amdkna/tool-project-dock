@@ -1,4 +1,7 @@
+# Keep per-machine settings out of Git
 config.toml
+**/config.toml
+
 dist/
 *.exe
 workspace/

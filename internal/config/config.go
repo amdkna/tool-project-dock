@@ -10,28 +10,24 @@ import (
  "github.com/BurntSushi/toml"
 )
 
-type Config struct {
- Project Project `toml:"project"`
- Git Git `toml:"git"`
-}
-type Project struct {
+type Config struct { Repositories []Repository `toml:"repositories"` }
+type Repository struct {
  Name string `toml:"name"`
+ URL string `toml:"url"`
  Directory string `toml:"directory"`
-}
-type Git struct {
- Remote string `toml:"remote"`
  Branch string `toml:"branch"`
+ Remote string `toml:"remote"`
 }
 
-const DefaultTOML = `# Dock by Webigram - local configuration
-# Relative paths resolve relative to config.toml
-[project]
-name = "My Project"
-directory = "./workspace"
+const DefaultTOML = `# Dock by Webigram
+# Use single quotes for Windows paths. Add another [[repositories]] block per app.
 
-[git]
-remote = "origin"
+[[repositories]]
+name = "Sample Project"
+url = "https://github.com/example/project.git"
+directory = './workspace/sample-project'
 branch = "main"
+remote = "origin"
 `
 
 func Ensure(path string) error {
@@ -48,11 +44,27 @@ func Ensure(path string) error {
 
 func Load(path string) (Config, error) {
  var cfg Config
- if _, err := toml.DecodeFile(path, &cfg); err != nil { return cfg, fmt.Errorf("read config: %w", err) }
- if strings.TrimSpace(cfg.Project.Directory) == "" { return cfg, errors.New("project.directory is required") }
- if strings.TrimSpace(cfg.Git.Remote) == "" { return cfg, errors.New("git.remote is required") }
- if strings.TrimSpace(cfg.Git.Branch) == "" { return cfg, errors.New("git.branch is required") }
- if !filepath.IsAbs(cfg.Project.Directory) { cfg.Project.Directory = filepath.Join(filepath.Dir(path), cfg.Project.Directory) }
- cfg.Project.Directory = filepath.Clean(cfg.Project.Directory)
- return cfg, nil
+ meta, err := toml.DecodeFile(path, &cfg)
+ if err != nil { return cfg, fmt.Errorf("read config: %w", err) }
+ if u := meta.Undecoded(); len(u)>0 { return cfg, fmt.Errorf("unknown configuration field: %s",u[0].String()) }
+ if len(cfg.Repositories)==0 { return cfg, errors.New("add at least one [[repositories]] entry") }
+ used := map[string]bool{}
+ for i:=range cfg.Repositories {
+  r:=&cfg.Repositories[i]
+  r.Name = strings.TrimSpace(r.Name)
+  r.URL = strings.TrimSpace(r.URL)
+  r.Directory = strings.TrimSpace(r.Directory)
+  r.Branch = strings.TrimSpace(r.Branch)
+  r.Remote = strings.TrimSpace(r.Remote)
+  if r.Name=="" || r.URL=="" || r.Directory=="" || r.Branch=="" {
+   return cfg, fmt.Errorf("repositories[%d]: name, url, directory and branch are required",i+1)
+  }
+  if r.Remote=="" { r.Remote="origin" }
+  if !filepath.IsAbs(r.Directory) { r.Directory=filepath.Join(filepath.Dir(path),r.Directory) }
+  r.Directory=filepath.Clean(r.Directory)
+  key:=strings.ToLower(r.Directory)
+  if used[key] { return cfg, fmt.Errorf("duplicate local directory: %s",r.Directory) }
+  used[key]=true
+ }
+ return cfg,nil
 }
