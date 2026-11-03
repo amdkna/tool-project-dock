@@ -4,14 +4,20 @@
 Windows 10/11, Go 1.22+, Git for Windows and configured Git credentials. An internet connection is needed to fetch Go modules on first build.
 
 ## Build from PowerShell
+
 ```powershell
 cd 'C:\devs\Tools\dev\project-dock'
 git pull origin main
-go mod tidy
-New-Item -ItemType Directory -Force -Path 'dist' | Out-Null
-go build -ldflags="-H windowsgui" -o "dist/dock.exe" ./cmd/dock
-.\dist\dock.exe
+.\scripts\build.ps1
 ```
+
+To build and open the program:
+
+```powershell
+.\scripts\build.ps1 -Run
+```
+
+This script checks that Go is installed, runs `go mod tidy`, creates `dist` and compiles a GUI executable into `dist/dock.exe`. It reports failures without silently treating a failed build as successful. The first build requires internet access for Go dependencies. The generated `go.sum` file should be committed once dependencies are resolved.
 
 ## Usage
 1. Launch Dock.
@@ -22,7 +28,7 @@ go build -ldflags="-H windowsgui" -o "dist/dock.exe" ./cmd/dock
 
 PULL executes `git -C <directory> pull --ff-only <remote> <branch>` and refuses non-fast-forward merges. PUSH executes `git -C <directory> push <remote> <branch>` and transfers existing commits only; it does **not** stage or commit files. No force-push is provided. Git terminal prompting is disabled; authenticate using Git for Windows first.
 
-## Limitations of 0.1.1
+## Limitations of 0.1.2
 - A local cloned repository must already exist. Clone and project preview are not implemented.
 - Git output is displayed **after the command completes**, not streamed live.
 - One command at a time per instance; separate instances should have separate executable directories and should not operate simultaneously on one Git working tree.

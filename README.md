@@ -4,27 +4,33 @@
 
 A lightweight portable Windows developer tool for Git-based projects. The first release is a native GUI foundation; local web preview comes in a later iteration.
 
-## Current version: ver. 0.1.1
+## Current version: ver. 0.1.2
 
 Implemented:
 - **File > Config...** to open an auto-generated `config.toml` in Notepad.
-- **Info > ver. 0.1.1** menu label.
+- **Info > ver. 0.1.2** menu label.
 - Two main buttons: **PULL** and **PUSH**, operating on a configured existing local Git repository.
 - Activity log and non-blocking Git execution.
 
 Not yet implemented: Clone, start/stop web servers, project previews, automatic project detection and full multi-instance isolation.
 
 ## Windows build
-Requires Go 1.22+ and Git for Windows:
+Requires Windows, Go 1.22+ and Git for Windows.
+
+From the repository root in PowerShell:
 
 ```powershell
-cd 'C:\devs\Tools\dev\project-dock'
 git pull origin main
-go mod tidy
-New-Item -ItemType Directory -Force -Path 'dist' | Out-Null
-go build -ldflags="-H windowsgui" -o 'dist/dock.exe' ./cmd/dock
-.\dist\dock.exe
+.\scripts\build.ps1
 ```
+
+To build and launch in one step:
+
+```powershell
+.\scripts\build.ps1 -Run
+```
+
+The script resolves Go dependencies, creates `dist` and compiles `dist/dock.exe`. It works regardless of the current working directory when invoked by path. It does **not** automatically pull Git changes.
 
 The executable generates `config.toml` beside itself on first start. Edit that file through **File > Config...** and set `project.directory` to an existing Git clone.
 
