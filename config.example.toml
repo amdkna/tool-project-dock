@@ -1,0 +1,8 @@
+# Generated as config.toml next to dock.exe on first run.
+[project]
+name = "My Project"
+directory = "./workspace"
+
+[git]
+remote = "origin"
+branch = "main"
