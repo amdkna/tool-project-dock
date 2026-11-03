@@ -1,12 +1,22 @@
 # Development guide
 
+## Windows setup and update
+
+Run `install.bat` from the repository root (or by absolute path). It checks Git, installs Go via winget if missing, allows local PowerShell scripts with `CurrentUser RemoteSigned` if required, and fast-forward pulls `main` if the working tree is clean.
+
+It deliberately does not bypass machine or organizational Group Policy. It does not force-pull, reset or discard uncommitted files. Go installation through winget may prompt for elevated privileges. It does not run the application build.
+
+```powershell
+cd 'C:\devs\Tools\dev\project-dock'
+.\install.bat
+```
+
 ## Build
 
 Windows 10/11, Go 1.22+ and Git for Windows required.
 
 ```powershell
 cd 'C:\devs\Tools\dev\project-dock'
-git pull origin main
 .\scripts\build.ps1 -Run
 ```
 
