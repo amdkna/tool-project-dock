@@ -2,16 +2,19 @@
 
 **Pull. Run. Preview.**
 
-Lightweight portable Windows Git project utility. **Current version: ver. 0.1.7.**
+Lightweight portable Windows Git project utility. **Current version: ver. 0.1.8.**
 
 ## Current features
 
 - Native Go + Walk GUI.
-- File > Config..., File > Refresh, Info > ver. 0.1.7.
+- File > Config..., File > Refresh, Info > ver. 0.1.8.
 - Multiple repositories defined using TOML `[[repositories]]` blocks.
 - Compact bordered repository rows: PULL/PUSH buttons on the left, name and branch to the right.
 - File > Refresh reloads the TOML and updates rows, without restarting.
 - Non-blocking Git operations with an activity log.
+- **Folder** button on each repository row opens Windows Explorer.
+- **Add New...** opens a URL, branch and standard Windows folder chooser; clones to a named subfolder and appends its entry to ignored TOML.
+- **File > GitHub Token...** saves a masked token via Git Credential Manager in Windows Credential Manager (dedicated Dock namespace, never TOML).
 - The private `config.toml` is ignored by Git; tracked sample: [config.example.toml](config.example.toml).
 
 ## Initial setup / update (Command Prompt or PowerShell)
@@ -56,10 +59,20 @@ remote = "origin"
 
 Dock accepts directory = "C:\devs\test\" with single backslashes and a trailing slash. This is a Dock-specific convenience; literal TOML paths and properly escaped paths remain supported. All other fields follow standard TOML.
 
-Every repository needs name, URL, directory, branch; remote defaults to origin. Relative paths are relative to config.toml. Local clones must already exist. The configured URL must match the local remote exactly. TOML contains no credentials.
+Every repository needs name, URL, directory, branch; remote defaults to origin. Relative paths are relative to config.toml. Add New clones repositories automatically, while rows already in TOML still expect their local directories to exist. The configured URL must match the local remote exactly. TOML contains no credentials.
 
 PULL uses `git pull --ff-only <remote> <branch>`. PUSH uses `git push <remote> <branch>` (already committed changes only). Neither force-pushes or automatically commits.
 
-**Not yet included:** cloning, local web servers, project previews and robust concurrency across different Dock processes. Existing configurations from v0.1.2 must be migrated from `[project]`/`[git]` to `[[repositories]]`.
+**Not yet included:** web preview, local web servers, project previews and robust concurrency across different Dock processes. Existing configurations from v0.1.2 must be migrated from `[project]`/`[git]` to `[[repositories]]`.
 
 See [development guide](docs/DEVELOPMENT.md), [roadmap](docs/ROADMAP.md) and [changelog](CHANGELOG.md). The Windows build has not yet been verified in the authoring environment.
+
+## Publishing Windows releases
+
+GitHub CLI (gh) must be installed and authenticated using `gh auth login`. Publish the next application version from a clean, synchronized main branch:
+
+```powershell
+.\scripts\release.ps1
+```
+
+The release script builds `distdock.exe`, generates a SHA-256 checksum and publishes both artifacts as a NEW GitHub release tagged with the app version. It refuses to overwrite an existing version. Use `-SkipBuild` only when the existing EXE was built from exactly the current source.

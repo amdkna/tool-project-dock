@@ -2,6 +2,14 @@
 
 Version policy: `x.y.z`; x remains 0 until owner changes it, y remains 1 until owner changes it, and z increments on every published update (maximum 999).
 
+## [0.1.8] - 2026-11-05
+- Added a GitHub token dialog using Git Credential Manager and Windows Credential Manager with an isolated Dock namespace.
+- Added Explorer folder buttons for each configured repository.
+- Added Add New repository dialog with HTTPS URL, branch and Windows folder chooser; clones to parent/repository folder.
+- Added TOML repository entry append with validation, preserving existing entries.
+- Added scripts/release.ps1 for versioned GitHub Releases, Windows builds and SHA-256 checksums.
+- Updated documentation and app version.
+
 ## [0.1.7] - 2026-11-05
 - Support native Windows paths with single backslashes in double-quoted directory fields.
 - Preserve standard TOML literal and escaped path forms.

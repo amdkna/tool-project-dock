@@ -9,11 +9,12 @@ import (
  "sync/atomic"
 
  "github.com/amdkna/tool-project-dock/internal/config"
+ "github.com/amdkna/tool-project-dock/internal/auth"
  "github.com/lxn/walk"
  . "github.com/lxn/walk/declarative"
 )
 
-const version = "0.1.7"
+const version = "0.1.8"
 
 func main() {
  exe,err:=os.Executable()
@@ -53,7 +54,7 @@ func main() {
    if strings.TrimSpace(string(remoteURL))!=repo.URL {
     logLine(fmt.Sprintf("[%s] Local remote URL differs from config URL. Cancelled.",repo.Name));return
    }
-   args:=[]string{"-C",repo.Directory}
+   args:=[]string{"-c","credential.helper=","-c","credential.helper=manager","-C",repo.Directory}
    if action=="PULL" {
     args=append(args,"pull","--ff-only",repo.Remote,repo.Branch)
    } else {
@@ -61,7 +62,7 @@ func main() {
    }
    logLine("["+repo.Name+"] "+action+" started...")
    git:=exec.Command("git",args...)
-   git.Env=append(os.Environ(),"GIT_TERMINAL_PROMPT=0")
+   git.Env=append(auth.Env(),"GIT_TERMINAL_PROMPT=0")
    out,err:=git.CombinedOutput()
    if len(out)>0 {logLine(strings.TrimRight(string(out),"\r\n"))}
    if err!=nil {logLine(fmt.Sprintf("[ERROR] %s %s: %v",repo.Name,action,err));return}
@@ -75,7 +76,17 @@ func main() {
   }
  }
 
+ openExplorer:=func(repo config.Repository){
+  if info,err:=os.Stat(repo.Directory);err!=nil||!info.IsDir(){
+   walk.MsgBox(mw,"Dock","Folder does not exist: "+repo.Directory,walk.MsgBoxIconWarning);return
+  }
+  if err:=exec.Command("explorer.exe",repo.Directory).Start();err!=nil{
+   walk.MsgBox(mw,"Dock","Cannot open folder: "+err.Error(),walk.MsgBoxIconError)
+  }
+ }
+
  var refresh func()
+
  refresh=func(){
   if busy.Load() {walk.MsgBox(mw,"Dock","Finish Git operation before refresh.",walk.MsgBoxIconInformation);return}
   cfg,err:=config.Load(configPath)
@@ -97,12 +108,61 @@ func main() {
    if err!=nil {logLine("[ERROR] PUSH button: "+err.Error());return}
    push.SetText("PUSH")
    push.Clicked().Attach(func(){runGit(repo,"PUSH")})
+   explorer,err:=walk.NewPushButton(box)
+   if err!=nil{logLine("[ERROR] Folder button: "+err.Error());return}
+   explorer.SetText("Folder")
+   explorer.Clicked().Attach(func(){openExplorer(repo)})
    name,err:=walk.NewLabel(box)
    if err!=nil {logLine("[ERROR] Label: "+err.Error());return}
    name.SetText(repo.Name+"   |   "+repo.Branch)
   }
   repoList.RequestLayout()
   logLine(fmt.Sprintf("[OK] Loaded %d repositories",len(cfg.Repositories)))
+ }
+
+ addNew:=func(){
+  if busy.Load(){walk.MsgBox(mw,"Dock","Wait until the Git operation finishes.",walk.MsgBoxIconInformation);return}
+  repo,ok:=addRepositoryDialog(mw)
+  if !ok{return}
+  if !busy.CompareAndSwap(false,true){return}
+  go func(){
+   defer busy.Store(false)
+   // Folder picker selects a parent directory; clone to parent/repo-name.
+   if info,err:=os.Stat(repo.Directory);err==nil{
+    if !info.IsDir(){logLine("[ERROR] Target exists and is not a directory: "+repo.Directory);return}
+    check:=exec.Command("git","-C",repo.Directory,"rev-parse","--is-inside-work-tree")
+    if out,err:=check.Output();err!=nil||strings.TrimSpace(string(out))!="true"{
+     logLine("[ERROR] Target folder exists but is not a Git checkout: "+repo.Directory);return
+    }
+    remote:=exec.Command("git","-C",repo.Directory,"remote","get-url","origin")
+    remoteURL,err:=remote.Output()
+    if err!=nil||strings.TrimSpace(string(remoteURL))!=repo.URL{
+     logLine("[ERROR] Existing clone remote does not match supplied GitHub URL.");return
+    }
+   }else if !os.IsNotExist(err){
+    logLine("[ERROR] Could not inspect destination: "+err.Error());return
+   }else{
+    logLine("[CLONE] "+repo.Name+" -> "+repo.Directory)
+    cmd:=exec.Command("git","-c","credential.helper=","-c","credential.helper=manager","clone","--branch",repo.Branch,"--",repo.URL,repo.Directory)
+    cmd.Env=append(auth.Env(),"GIT_TERMINAL_PROMPT=0")
+    out,err:=cmd.CombinedOutput()
+    if err!=nil{logLine(fmt.Sprintf("[ERROR] Clone failed: %v %s",err,strings.TrimSpace(string(out))));return}
+    logLine("[OK] Clone finished: "+repo.Name)
+   }
+   if err:=config.Add(configPath,repo);err!=nil{logLine("[ERROR] Config save: "+err.Error());return}
+   logLine("[OK] Added repository: "+repo.Name)
+   mw.Synchronize(func(){busy.Store(false);refresh()})
+  }()
+ }
+
+ saveToken:=func(){
+  if busy.Load(){walk.MsgBox(mw,"Dock","Finish the current operation first.",walk.MsgBoxIconInformation);return}
+  username,token,ok:=tokenDialog(mw)
+  if !ok{return}
+  if err:=auth.StoreGitHub(username,token);err!=nil{
+   walk.MsgBox(mw,"GitHub token",err.Error(),walk.MsgBoxIconError);return
+  }
+  walk.MsgBox(mw,"GitHub token","Saved using Git Credential Manager and Windows Credential Manager.",walk.MsgBoxIconInformation)
  }
 
  ui:=MainWindow{
@@ -115,13 +175,18 @@ func main() {
    Menu{Text:"&File",Items:[]MenuItem{
     Action{Text:"&Config...",OnTriggered:openConfig},
     Action{Text:"&Refresh",OnTriggered:func(){refresh()}},
+    Action{Text:"&GitHub Token...",OnTriggered:saveToken},
    }},
    Menu{Text:"&Info",Items:[]MenuItem{
     Action{Text:"ver. "+version,Enabled:false},
    }},
   },
   Children:[]Widget{
-   Label{Text:"Configured repositories  |  File > Config to edit  |  File > Refresh to reload"},
+   Composite{Layout:HBox{},Children:[]Widget{
+    Label{Text:"Configured repositories"},
+    HSpacer{},
+    PushButton{Text:"Add New...",OnClicked:addNew},
+   }},
    Composite{AssignTo:&repoList,Layout:VBox{MarginsZero:true,Spacing:5}},
    Label{Text:"Activity log"},
    TextEdit{AssignTo:&output,ReadOnly:true,VScroll:true},

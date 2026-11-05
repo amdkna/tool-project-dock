@@ -37,3 +37,17 @@ Live output is not streamed; the completed command's output is shown in logs. No
 ## Versioning
 
 `x.y.z`: x=0 until explicitly changed, y=1 until owner requests otherwise, z increments with each application update (up to 999). Keep source version, changelog and README synchronized.
+
+
+## GitHub token security (v0.1.8)
+
+File > GitHub Token... asks for the account username and a fine-grained PAT (masked entry).
+The token is passed only via standard input to Git Credential Manager and stored in Windows Credential Manager using `GCM_CREDENTIAL_STORE=wincredman` and `GCM_NAMESPACE=webigram-dock`. The same namespace and credential helper are used for Git network operations. This keeps Dock separate from other Git client credentials. No token is saved to TOML, stdout or command arguments. Git Credential Manager must be present (normally supplied with Git for Windows). HTTPS GitHub remotes are supported, not SSH token authentication. Windows account security still matters; grant only necessary repository permissions and rotate compromised PATs.
+
+## Add New and Explorer
+
+Choose Add New, enter GitHub HTTPS URL and branch, and browse an existing parent folder. Dock creates/reuses a subfolder named after the repository, clones when absent, verifies an existing clone's remote and writes a TOML repository block. A failed clone is not added to the config. Folder buttons open the configured path in Explorer.
+
+## Publishing releases
+
+Install GitHub CLI: `winget install GitHub.cli` and authenticate with `gh auth login`. Run `.scriptselease.ps1` on main with a clean working tree synced to origin/main. The script creates a new version tag release, uploads the built Windows EXE and SHA-256 checksum, and refuses existing releases. It never silently replaces a release asset. The executable build and runtime features require Windows testing.
