@@ -2,6 +2,12 @@
 
 Version policy: `x.y.z`; x remains 0 until owner changes it, y remains 1 until owner changes it, and z increments on every published update (maximum 999).
 
+## [0.1.10] - 2026-11-05
+- Fixed Add New to persist repository settings in the ignored dist/config.toml before attempting Git clone.
+- Refreshes repository cards immediately after saving, so network/authentication failures no longer lose the new entry.
+- Displays configuration write failures explicitly and retains clone errors in the activity log.
+- Updated README and development documentation.
+
 ## [0.1.9] - 2026-11-05
 - Added root `update-now.bat`: clear screen, fast-forward pull, compare before/after Git commit IDs, and build/run only when updated.
 - Renamed each repository's Folder button to Browse.

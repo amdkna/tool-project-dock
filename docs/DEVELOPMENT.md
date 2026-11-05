@@ -46,7 +46,7 @@ The token is passed only via standard input to Git Credential Manager and stored
 
 ## Add New and Explorer
 
-Choose Add New, enter GitHub HTTPS URL and branch, and browse an existing parent folder. Dock creates/reuses a subfolder named after the repository, clones when absent, verifies an existing clone's remote and writes a TOML repository block. A failed clone is not added to the config. Folder buttons open the configured path in Explorer.
+Choose Add New, enter GitHub HTTPS URL and branch, and browse an existing parent folder. Dock writes the TOML repository block first and refreshes the GUI, then creates/reuses a subfolder named after the repository and clones when absent. If clone fails, the entry stays in config.toml for recovery; the Activity log shows the error. Use File > Config to correct the entry and File > Refresh to reload it. Browse buttons open the configured path in Explorer.
 
 ## Publishing releases
 

@@ -14,7 +14,7 @@ import (
  . "github.com/lxn/walk/declarative"
 )
 
-const version = "0.1.9"
+const version = "0.1.10"
 
 func main() {
  exe,err:=os.Executable()
@@ -124,6 +124,14 @@ func main() {
   if busy.Load(){walk.MsgBox(mw,"Dock","Wait until the Git operation finishes.",walk.MsgBoxIconInformation);return}
   repo,ok:=addRepositoryDialog(mw)
   if !ok{return}
+  // Persist and display the new repository before cloning, so failed
+  // authentication/network operations never silently drop the new entry.
+  if err:=config.Add(configPath,repo);err!=nil{
+   walk.MsgBox(mw,"Cannot save project","Could not update config.toml: "+err.Error(),walk.MsgBoxIconError)
+   return
+  }
+  refresh()
+  logLine("[OK] Saved "+repo.Name+" in "+configPath)
   if !busy.CompareAndSwap(false,true){return}
   go func(){
    defer busy.Store(false)
@@ -149,9 +157,7 @@ func main() {
     if err!=nil{logLine(fmt.Sprintf("[ERROR] Clone failed: %v %s",err,strings.TrimSpace(string(out))));return}
     logLine("[OK] Clone finished: "+repo.Name)
    }
-   if err:=config.Add(configPath,repo);err!=nil{logLine("[ERROR] Config save: "+err.Error());return}
-   logLine("[OK] Added repository: "+repo.Name)
-   mw.Synchronize(func(){busy.Store(false);refresh()})
+   logLine("[OK] Repository ready: "+repo.Name)
   }()
  }
 
