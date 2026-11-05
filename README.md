@@ -2,20 +2,28 @@
 
 **Pull. Run. Preview.**
 
-Lightweight portable Windows Git project utility. **Current version: ver. 0.1.8.**
+Lightweight portable Windows Git project utility. **Current version: ver. 0.1.9.**
 
 ## Current features
 
 - Native Go + Walk GUI.
-- File > Config..., File > Refresh, Info > ver. 0.1.8.
+- File > Config..., File > Refresh, Info > ver. 0.1.9.
 - Multiple repositories defined using TOML `[[repositories]]` blocks.
 - Compact bordered repository rows: PULL/PUSH buttons on the left, name and branch to the right.
 - File > Refresh reloads the TOML and updates rows, without restarting.
 - Non-blocking Git operations with an activity log.
-- **Folder** button on each repository row opens Windows Explorer.
+- **Browse** button on each repository row opens Windows Explorer.
 - **Add New...** opens a URL, branch and standard Windows folder chooser; clones to a named subfolder and appends its entry to ignored TOML.
-- **File > GitHub Token...** saves a masked token via Git Credential Manager in Windows Credential Manager (dedicated Dock namespace, never TOML).
+- **File > GitHub Token...** includes a direct Create GitHub Token link and required permissions; it saves a masked token via Git Credential Manager in Windows Credential Manager (dedicated Dock namespace, never TOML).
 - The private `config.toml` is ignored by Git; tracked sample: [config.example.toml](config.example.toml).
+
+## One-click update
+
+Run `update-now.bat` from the repository root. It clears the console, fast-forward pulls `origin/main`, compares Git HEAD before and after pulling, and runs `scripts/build.ps1 -Run` **only if a new commit was pulled**. No changes means no rebuild and no launch. A failed pull stops the script. This is based on Git commit IDs, not an artifact checksum; manually deleted builds are not regenerated when the commit is unchanged.
+
+```powershell
+.\update-now.bat
+```
 
 ## Initial setup / update (Command Prompt or PowerShell)
 

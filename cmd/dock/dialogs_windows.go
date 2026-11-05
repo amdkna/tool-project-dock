@@ -2,6 +2,7 @@ package main
 
 import (
  "fmt"
+ "os/exec"
  "path/filepath"
  "strings"
 
@@ -64,14 +65,26 @@ func tokenDialog(owner *walk.MainWindow)(string,string,bool){
  var accepted bool
  _,err:=(Dialog{
   AssignTo:&dlg,Title:"GitHub token - Windows Credential Manager",
-  MinSize:Size{Width:540,Height:230},
+  MinSize:Size{Width:660,Height:310},
   Layout:VBox{},
   Children:[]Widget{
    Label{Text:"GitHub username"},
    LineEdit{AssignTo:&userEdit},
    Label{Text:"Fine-grained personal access token (masked; not stored in TOML)"},
    LineEdit{AssignTo:&tokenEdit,PasswordMode:true},
-   Label{Text:"Requires Git Credential Manager from Git for Windows."},
+   Label{Text:"Permissions for fine-grained tokens: Repository Contents = Read and write."},
+   Label{Text:"Repository access: select only the repositories you will pull and push."},
+   Label{Text:"Metadata = Read-only (automatically granted by GitHub). No extra permissions needed."},
+   Composite{Layout:HBox{},Children:[]Widget{
+    PushButton{Text:"Create GitHub Token",OnClicked:func(){
+     constURL:="https://github.com/settings/personal-access-tokens/new"
+     if err:=exec.Command("rundll32.exe","url.dll,FileProtocolHandler",constURL).Start();err!=nil{
+      walk.MsgBox(dlg,"Open GitHub",err.Error(),walk.MsgBoxIconError)
+     }
+    }},
+    HSpacer{},
+   }},
+   Label{Text:"Credentials are saved with Git Credential Manager, not in config.toml."},
    Composite{Layout:HBox{},Children:[]Widget{
     HSpacer{},
     PushButton{Text:"Save securely",OnClicked:func(){

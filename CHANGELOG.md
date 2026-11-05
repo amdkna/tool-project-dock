@@ -2,6 +2,13 @@
 
 Version policy: `x.y.z`; x remains 0 until owner changes it, y remains 1 until owner changes it, and z increments on every published update (maximum 999).
 
+## [0.1.9] - 2026-11-05
+- Added root `update-now.bat`: clear screen, fast-forward pull, compare before/after Git commit IDs, and build/run only when updated.
+- Renamed each repository's Folder button to Browse.
+- Added a Create GitHub Token button in the token dialog opening GitHub's fine-grained token creation page.
+- Explained least-privilege token setup: selected repositories, Contents read/write, Metadata read-only.
+- Updated README and development documentation.
+
 ## [0.1.8] - 2026-11-05
 - Added a GitHub token dialog using Git Credential Manager and Windows Credential Manager with an isolated Dock namespace.
 - Added Explorer folder buttons for each configured repository.

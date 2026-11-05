@@ -51,3 +51,11 @@ Choose Add New, enter GitHub HTTPS URL and branch, and browse an existing parent
 ## Publishing releases
 
 Install GitHub CLI: `winget install GitHub.cli` and authenticate with `gh auth login`. Run `.scriptselease.ps1` on main with a clean working tree synced to origin/main. The script creates a new version tag release, uploads the built Windows EXE and SHA-256 checksum, and refuses existing releases. It never silently replaces a release asset. The executable build and runtime features require Windows testing.
+
+## Update Now (v0.1.9)
+
+Run `update-now.bat` from the repository root (or absolute path). It uses `git rev-parse HEAD` before and after a safe `git pull --ff-only origin main`. If the revision changed, it runs `scripts/build.ps1 -Run`. If HEAD is unchanged, it skips compilation and does not start a new application instance. It stops on pull or build errors. This does not repair a missing EXE if there is no new commit; for a manual rebuild use `scripts/build.ps1 -Run`.
+
+## Fine-grained GitHub token permissions
+
+Within File > GitHub Token, choose **Create GitHub Token** to open https://github.com/settings/personal-access-tokens/new. Select the intended GitHub resource owner and limit access to only the desired repositories. For private repository pull and push, use **Repository permissions > Contents: Read and write**; GitHub automatically grants **Metadata: Read-only**. No administration, workflows or other permissions are required for ordinary Git push and pull (workflow changes may need additional permissions). Use a limited expiration and protect the Windows user profile.
