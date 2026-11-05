@@ -24,7 +24,7 @@ The build script uses `go run github.com/akavel/rsrc@latest` to compile `assets/
 
 ## Configuration
 
-The sample `config.example.toml` is tracked. Use TOML `[[repositories]]` blocks, with `name`, `url`, `directory`, `branch`, and optional `remote` (default `origin`). The app validates required fields and rejects duplicate local directories and unknown config keys. Use single quotes for Windows paths to avoid escaping backslashes.
+The sample `config.example.toml` is tracked. Use TOML `[[repositories]]` blocks, with `name`, `url`, `directory`, `branch`, and optional `remote` (default `origin`). The app validates required fields and rejects duplicate local directories and unknown config keys. Dock also accepts directory = "C:\devs\test\" with single backslashes in double quotes. Standard TOML literal paths and properly escaped strings remain valid.
 
 **Migration from 0.1.2:** replace the old `[project]` and `[git]` sections with one or more `[[repositories]]` blocks. Set the URL to match `git remote get-url origin`. Config is read on startup and on **File > Refresh**; invalid config leaves previous rows unchanged.
 

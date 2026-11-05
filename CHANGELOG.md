@@ -2,6 +2,11 @@
 
 Version policy: `x.y.z`; x remains 0 until owner changes it, y remains 1 until owner changes it, and z increments on every published update (maximum 999).
 
+## [0.1.7] - 2026-11-05
+- Support native Windows paths with single backslashes in double-quoted directory fields.
+- Preserve standard TOML literal and escaped path forms.
+- Added path parsing tests and updated examples and documentation.
+
 ## [0.1.6] - 2026-11-05
 - Fixed the Walk startup error `TTM_ADDTOOL failed` caused by a missing Windows Common Controls v6 application manifest.
 - Added `assets/dock.manifest` and resource embedding to `scripts/build.ps1` using rsrc.

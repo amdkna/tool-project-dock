@@ -2,12 +2,12 @@
 
 **Pull. Run. Preview.**
 
-Lightweight portable Windows Git project utility. **Current version: ver. 0.1.6.**
+Lightweight portable Windows Git project utility. **Current version: ver. 0.1.7.**
 
 ## Current features
 
 - Native Go + Walk GUI.
-- File > Config..., File > Refresh, Info > ver. 0.1.6.
+- File > Config..., File > Refresh, Info > ver. 0.1.7.
 - Multiple repositories defined using TOML `[[repositories]]` blocks.
 - Compact bordered repository rows: PULL/PUSH buttons on the left, name and branch to the right.
 - File > Refresh reloads the TOML and updates rows, without restarting.
@@ -42,17 +42,19 @@ The build script generates a temporary Windows resource from `assets/dock.manife
 [[repositories]]
 name = "Website"
 url = "https://github.com/example/website.git"
-directory = 'C:\devs\website'
+directory = "C:\devs\website\"
 branch = "main"
 remote = "origin"
 
 [[repositories]]
 name = "API"
 url = "https://github.com/example/api.git"
-directory = 'C:\devs\api'
+directory = "C:\devs\api\"
 branch = "dev"
 remote = "origin"
 ```
+
+Dock accepts directory = "C:\devs\test\" with single backslashes and a trailing slash. This is a Dock-specific convenience; literal TOML paths and properly escaped paths remain supported. All other fields follow standard TOML.
 
 Every repository needs name, URL, directory, branch; remote defaults to origin. Relative paths are relative to config.toml. Local clones must already exist. The configured URL must match the local remote exactly. TOML contains no credentials.
 
