@@ -2,6 +2,13 @@
 
 Version policy: `x.y.z`; x remains 0 until owner changes it, y remains 1 until owner changes it, and z increments on every published update (maximum 999).
 
+## [0.1.14] - 2026-11-05
+- PUSH now opens a small commit-message dialog with Commit & Push and Cancel.
+- Commit & Push stages all non-ignored changes (git add -A), creates a commit if needed, and pushes the checked-out configured branch.
+- Validates the repository root, remote URL and current branch before staging; reports stage, commit and push errors in the activity log.
+- If no changes are staged, pushes existing local commits without creating an empty commit.
+- Updated documentation and application version.
+
 ## [0.1.13] - 2026-11-05
 - Added Info > Project Repo opening https://github.com/amdkna/www-freelanceops in the default browser.
 - Added a Git Repo button to every repository row, opening its configured GitHub URL.

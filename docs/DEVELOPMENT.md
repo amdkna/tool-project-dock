@@ -77,3 +77,7 @@ If an older Dock version already wrote an entry for a failed clone, use File > C
 ## Repository browser shortcuts (v0.1.13)
 
 **Info > Project Repo** opens https://github.com/amdkna/www-freelanceops. Each configured repository row includes **Git Repo** next to Browse, opening the `url` field of that repository in the default browser. Only HTTPS GitHub URLs are accepted, and invalid links produce a warning.
+
+## PUSH commit dialog (v0.1.14)
+
+Click PUSH on a repository row to open the commit-message dialog. Cancel exits without staging, committing, or pushing. **Commit & Push** checks the configured folder is the Git root and that the URL/branch match the local checkout, then runs `git add -A`, `git diff --cached --quiet`, `git commit -m "<message>"` if changes exist, and finally `git push <remote> HEAD:refs/heads/<branch>`. Git respects `.gitignore` for untracked files; already tracked files are still staged even if later added to `.gitignore`. This includes deletions and any existing staged changes. An empty working tree does not generate an empty commit but still pushes outgoing commits. Git identity (`user.name` and `user.email`) must be configured; if a commit or push fails, prior local staging/commits remain in place. No force push. Git Credential Manager may prompt for authentication.

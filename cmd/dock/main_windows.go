@@ -15,7 +15,7 @@ import (
  . "github.com/lxn/walk/declarative"
 )
 
-const version = "0.1.13"
+const version = "0.1.14"
 
 func main() {
  exe,err:=os.Executable()
@@ -119,7 +119,7 @@ func main() {
    push,err:=walk.NewPushButton(box)
    if err!=nil {logLine("[ERROR] PUSH button: "+err.Error());return}
    push.SetText("PUSH")
-   push.Clicked().Attach(func(){runGit(repo,"PUSH")})
+   push.Clicked().Attach(func(){commitAndPush(mw,repo,&busy,logLine)})
    explorer,err:=walk.NewPushButton(box)
    if err!=nil{logLine("[ERROR] Browse button: "+err.Error());return}
    explorer.SetText("Browse")

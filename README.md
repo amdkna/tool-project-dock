@@ -2,12 +2,12 @@
 
 **Pull. Run. Preview.**
 
-Lightweight portable Windows Git project utility. **Current version: ver. 0.1.13.**
+Lightweight portable Windows Git project utility. **Current version: ver. 0.1.14.**
 
 ## Current features
 
 - Native Go + Walk GUI.
-- File > Config..., File > Refresh, Info > ver. 0.1.13.
+- File > Config..., File > Refresh, Info > ver. 0.1.14.
 - Multiple repositories defined using TOML `[[repositories]]` blocks.
 - Compact bordered repository rows: PULL/PUSH buttons on the left, name and branch to the right.
 - File > Refresh reloads the TOML and updates rows, without restarting.
@@ -70,7 +70,7 @@ Dock accepts directory = "C:\devs\test\" with single backslashes and a trailing 
 
 Every repository needs name, URL, directory, branch; remote defaults to origin. Relative paths are relative to config.toml. Add New clones (or verifies the existing clone) before saving a repository entry; if cloning fails, no broken entry is added, while rows already in TOML still expect their local directories to exist. The configured URL must match the local remote exactly. TOML contains no credentials.
 
-PULL uses `git pull --ff-only <remote> <branch>`. PUSH uses `git push <remote> <branch>` (already committed changes only). Neither force-pushes or automatically commits.
+PULL uses `git pull --ff-only <remote> <branch>`. PUSH opens a commit-message dialog. Clicking **Commit & Push** stages all non-ignored changes using `git add -A`, commits them using your message (if there are changes), then pushes the configured branch. If no changes exist, it pushes existing commits. Cancel makes no changes. Pull remains fast-forward only, and Dock never force-pushes.
 
 **Not yet included:** web preview, local web servers, project previews and robust concurrency across different Dock processes. Existing configurations from v0.1.2 must be migrated from `[project]`/`[git]` to `[[repositories]]`.
 
