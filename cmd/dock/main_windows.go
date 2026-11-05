@@ -15,7 +15,7 @@ import (
  . "github.com/lxn/walk/declarative"
 )
 
-const version = "0.1.14"
+const version = "0.1.15"
 
 func main() {
  exe,err:=os.Executable()

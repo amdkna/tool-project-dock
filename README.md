@@ -2,12 +2,12 @@
 
 **Pull. Run. Preview.**
 
-Lightweight portable Windows Git project utility. **Current version: ver. 0.1.14.**
+Lightweight portable Windows Git project utility. **Current version: ver. 0.1.15.**
 
 ## Current features
 
 - Native Go + Walk GUI.
-- File > Config..., File > Refresh, Info > ver. 0.1.14.
+- File > Config..., File > Refresh, Info > ver. 0.1.15.
 - Multiple repositories defined using TOML `[[repositories]]` blocks.
 - Compact bordered repository rows: PULL/PUSH buttons on the left, name and branch to the right.
 - File > Refresh reloads the TOML and updates rows, without restarting.
@@ -20,7 +20,7 @@ Lightweight portable Windows Git project utility. **Current version: ver. 0.1.14
 
 ## One-click update
 
-Run `update-now.bat` from the repository root. It clears the console, fast-forward pulls `origin/main`, compares Git HEAD before and after pulling, and runs `scripts/build.ps1 -Run` **only if a new commit was pulled**. No changes means no rebuild and no launch. A failed pull stops the script. This is based on Git commit IDs, not an artifact checksum; manually deleted builds are not regenerated when the commit is unchanged.
+Run `update-now.bat` from the repository root. It clears the console, fast-forward pulls `origin/main`, compares Git HEAD before and after pulling, and **stops only this checkout's running `dist/dock.exe` process** before running `scripts/build.ps1 -Run` **only if a new commit was pulled**. No changes means no rebuild and no launch. A failed pull or failed process stop cancels the rebuild. Any active operations in the old Dock instance will be interrupted when an update requires rebuilding. This is based on Git commit IDs, not an artifact checksum; manually deleted builds are not regenerated when the commit is unchanged.
 
 ```powershell
 .\update-now.bat

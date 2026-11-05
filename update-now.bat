@@ -48,8 +48,15 @@ if /i "%BEFORE%"=="%AFTER%" (
     exit /b 0
 )
 
-echo [3/3] New revision detected: %AFTER%
-echo Building and launching Dock...
+echo [3/4] New revision detected: %AFTER%
+echo Closing running Dock instances from this project...
+powershell.exe -NoProfile -File "%~dp0scripts\stop-dock.ps1"
+if errorlevel 1 (
+    echo [ERROR] Could not close the running Dock process. Build cancelled.
+    exit /b 1
+)
+
+echo [4/4] Building and launching Dock...
 powershell.exe -NoProfile -File "%~dp0scripts\build.ps1" -Run
 if errorlevel 1 (
     echo [ERROR] Build or launch failed. See the PowerShell output above.
