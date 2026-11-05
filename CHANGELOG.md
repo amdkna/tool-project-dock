@@ -1,6 +1,12 @@
 # Changelog
 
-Version policy: `x.y.z`; x remains 0 until owner changes it, y remains 1 until owner changes it, and z increments on every published update (maximum 999).
+Version policy: the current beta baseline is `1.0b` (a product version label, not a claim of a published release). The next planned major version is `2.0`. Historical `0.1.x` entries are preserved below for development traceability. Future version labels will be determined by the product owner.
+
+## [1.0b] - 2026-11-05
+- Rebased the existing Dock application to the requested beta version label `1.0b`; no new application functionality in this change.
+- Updated source, README, and release-script version parsing to recognize the beta version label.
+- Added a dedicated Version 2.0 planning document with prioritized enhancements and acceptance criteria.
+- Preserved development history below without rewriting previous release entries.
 
 ## [0.1.15] - 2026-11-05
 - Updated update-now.bat to close the currently running Dock application after a successful pull and only when a new commit is present.

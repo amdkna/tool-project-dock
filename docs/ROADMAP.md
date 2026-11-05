@@ -1,29 +1,31 @@
-# Product concept and roadmap
+# Dock by Webigram — Product roadmap
 
-Dock by Webigram is a lightweight, portable Windows developer tool for moving Git projects to a local test/development environment. Product tagline: **Pull. Run. Preview.**
+**Current application baseline:** `1.0b` (beta).  
+**Next planned major version:** `2.0`.
 
-## Original requirements
-- Desktop Windows GUI, portable and very lightweight.
-- Git PULL and PUSH buttons.
-- Local web server, initially suggested Nginx, for browser-based previews.
-- Configuration file.
-- Multiple independently running instances.
-- Documentation and release changelog.
+Dock is a lightweight portable Windows GUI for managing local Git repositories and eventually launching and previewing development projects.
 
-## Chosen approach
-- Go for the compiled application.
-- Walk for initial native Windows GUI.
-- TOML for human-editable project configuration.
-- Installed Git CLI initially; possible PortableGit bundle later.
-- Go `net/http` as a future static web server instead of requiring Nginx.
-- Separate workspace, local port and process lifecycle for each instance.
-- Future project detection for Vite, Node, Python, Go, PHP and Docker; do not automatically execute unknown scripts.
+## Version 1.0b — current baseline
 
-## Milestones
-1. **v0.1.1 delivered as source:** basic GUI, File/Info menus, config launcher, Git PULL/PUSH and command result log.
-2. Git Clone, project selection, branch/status UX and authentication guidance.
-3. Build/run/stop, preview URL, local HTTP server, auto port allocation.
-4. Reliable isolation for multiple app instances and process clean-up.
-5. Auto-detection of project stack and reusable project templates.
+The beta includes multi-repository TOML configuration, GitHub HTTPS authentication through Git Credential Manager, Add New with clone and access test, configurable clone destination, pull, stage/commit/push, Explorer and GitHub shortcuts, installation helpers, update/build scripts, activity logging and GitHub release publishing script.
 
-The tool currently manages an **existing** Git clone. Preview web hosting has not been implemented yet.
+The Version 1.0b label reflects the owner's requested version name. It does not imply a GitHub Release has been published or that Windows compatibility testing is complete.
+
+## Version 2.0 — planned
+
+All feature proposals and acceptance criteria are tracked in **[NEXT-VERSION-2.0.md](NEXT-VERSION-2.0.md)**. They are not implemented in 1.0b.
+
+### Focus
+1. Safe Git status, changes preview and synchronized operations.
+2. Developer workspace usability and project management.
+3. Project commands, processes and preview capabilities.
+4. Reliable configuration backup, diagnostics and multiple-instance safety.
+
+### Design constraints
+- Maintain a fast, lightweight, primarily native Windows experience.
+- No automatic execution of unknown project scripts.
+- Never silently discard user changes, force-push, or disclose tokens.
+- Explicitly document and test supported Windows versions rather than promising compatibility without verification.
+- Existing 1.0b configuration should remain readable or be migrated safely.
+
+See [CHANGELOG.md](../CHANGELOG.md) for previous implementation history.

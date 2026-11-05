@@ -36,7 +36,7 @@ Live output is not streamed; the completed command's output is shown in logs. No
 
 ## Versioning
 
-`x.y.z`: x=0 until explicitly changed, y=1 until owner requests otherwise, z increments with each application update (up to 999). Keep source version, changelog and README synchronized.
+The current application baseline is `1.0b` (beta), as requested by the product owner. The next planned major version is `2.0`. Keep the source constant, README and changelog aligned; the release script recognizes the beta label when creating a `v1.0b` tag. No GitHub release is created just by changing source files. Version 2.0 feature planning is maintained in [NEXT-VERSION-2.0.md](NEXT-VERSION-2.0.md).
 
 
 ## GitHub token security (v0.1.8)

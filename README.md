@@ -2,12 +2,12 @@
 
 **Pull. Run. Preview.**
 
-Lightweight portable Windows Git project utility. **Current version: ver. 0.1.15.**
+Lightweight portable Windows Git project utility. **1.0b is the current beta baseline; Version 2.0 features are planned, not implemented.** **Current version: ver. 1.0b.**
 
 ## Current features
 
 - Native Go + Walk GUI.
-- File > Config..., File > Refresh, Info > ver. 0.1.15.
+- File > Config..., File > Refresh, Info > ver. 1.0b.
 - Multiple repositories defined using TOML `[[repositories]]` blocks.
 - Compact bordered repository rows: PULL/PUSH buttons on the left, name and branch to the right.
 - File > Refresh reloads the TOML and updates rows, without restarting.
@@ -74,7 +74,7 @@ PULL uses `git pull --ff-only <remote> <branch>`. PUSH opens a commit-message di
 
 **Not yet included:** web preview, local web servers, project previews and robust concurrency across different Dock processes. Existing configurations from v0.1.2 must be migrated from `[project]`/`[git]` to `[[repositories]]`.
 
-See [development guide](docs/DEVELOPMENT.md), [roadmap](docs/ROADMAP.md) and [changelog](CHANGELOG.md). The Windows build has not yet been verified in the authoring environment.
+See [development guide](docs/DEVELOPMENT.md), [Version 2.0 roadmap](docs/NEXT-VERSION-2.0.md), [product roadmap](docs/ROADMAP.md) and [changelog](CHANGELOG.md). The Windows build has not yet been verified in the authoring environment.
 
 ## Publishing Windows releases
 
@@ -84,7 +84,7 @@ GitHub CLI (gh) must be installed and authenticated using `gh auth login`. Publi
 .\scripts\release.ps1
 ```
 
-The release script builds `distdock.exe`, generates a SHA-256 checksum and publishes both artifacts as a NEW GitHub release tagged with the app version. It refuses to overwrite an existing version. Use `-SkipBuild` only when the existing EXE was built from exactly the current source.
+The release script builds `dist/dock.exe`, generates a SHA-256 checksum and publishes both artifacts as a NEW GitHub release tagged with the app version. It refuses to overwrite an existing version. Use `-SkipBuild` only when the existing EXE was built from exactly the current source.
 
 ## Install Tools compatibility
 

@@ -15,7 +15,7 @@ foreach($tool in @('git','gh')){
 }
 Push-Location $root
 try {
- $match=[regex]::Match((Get-Content -LiteralPath $source -Raw),'const\s+version\s*=\s*"(\d+\.\d+\.\d+)"')
+ $match=[regex]::Match((Get-Content -LiteralPath $source -Raw),'const\s+version\s*=\s*"(\d+\.\d+(?:\.\d+)?[a-z]?)"')
  if(-not $match.Success){throw 'Cannot determine app version from source.'}
  $version=$match.Groups[1].Value
  $tag="v$version"
