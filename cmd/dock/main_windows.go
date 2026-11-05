@@ -14,7 +14,7 @@ import (
  . "github.com/lxn/walk/declarative"
 )
 
-const version = "0.1.10"
+const version = "0.1.11"
 
 func main() {
  exe,err:=os.Executable()
@@ -171,6 +171,25 @@ func main() {
   walk.MsgBox(mw,"GitHub token","Saved using Git Credential Manager and Windows Credential Manager.",walk.MsgBoxIconInformation)
  }
 
+ installTool:=func(which string){
+  // Run in a visible console so the user can review installer prompts/errors.
+  script:=filepath.Join(filepath.Dir(exe),"..","scripts","install-tools.ps1")
+  // Executable usually lives in dist. For development builds in other
+  // locations, check an adjacent scripts directory as well.
+  if _,err:=os.Stat(script);err!=nil{
+   script=filepath.Join(filepath.Dir(exe),"scripts","install-tools.ps1")
+  }
+  if _,err:=os.Stat(script);err!=nil{
+   walk.MsgBox(mw,"Install Tools","Installer script not found next to the Dock project. Run from the source checkout or use the documented download links.",walk.MsgBoxIconWarning)
+   return
+  }
+  command:=fmt.Sprintf("& '%s' -Tool %s",strings.ReplaceAll(script,"'","''"),which)
+  cmd:=exec.Command("powershell.exe","-NoProfile","-NoExit","-Command",command)
+  if err:=cmd.Start();err!=nil{
+   walk.MsgBox(mw,"Install Tools","Cannot launch PowerShell installer: "+err.Error(),walk.MsgBoxIconError)
+  }
+ }
+
  ui:=MainWindow{
   AssignTo:&mw,
   Title:"Dock by Webigram | ver. "+version,
@@ -182,6 +201,12 @@ func main() {
     Action{Text:"&Config...",OnTriggered:openConfig},
     Action{Text:"&Refresh",OnTriggered:func(){refresh()}},
     Action{Text:"&GitHub Token...",OnTriggered:saveToken},
+    Menu{Text:"Install &Tools",Items:[]MenuItem{
+     Action{Text:"Install &Required (Git + GCM)",OnTriggered:func(){installTool("Required")}},
+     Action{Text:"Install Git for &Windows",OnTriggered:func(){installTool("Git")}},
+     Action{Text:"Install Git &Credential Manager",OnTriggered:func(){installTool("GCM")}},
+     Action{Text:"Install GitHub CLI (&gh)",OnTriggered:func(){installTool("GH")}},
+    }},
    }},
    Menu{Text:"&Info",Items:[]MenuItem{
     Action{Text:"ver. "+version,Enabled:false},

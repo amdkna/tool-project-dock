@@ -2,18 +2,19 @@
 
 **Pull. Run. Preview.**
 
-Lightweight portable Windows Git project utility. **Current version: ver. 0.1.10.**
+Lightweight portable Windows Git project utility. **Current version: ver. 0.1.11.**
 
 ## Current features
 
 - Native Go + Walk GUI.
-- File > Config..., File > Refresh, Info > ver. 0.1.10.
+- File > Config..., File > Refresh, Info > ver. 0.1.11.
 - Multiple repositories defined using TOML `[[repositories]]` blocks.
 - Compact bordered repository rows: PULL/PUSH buttons on the left, name and branch to the right.
 - File > Refresh reloads the TOML and updates rows, without restarting.
 - Non-blocking Git operations with an activity log.
 - **Browse** button on each repository row opens Windows Explorer.
 - **Add New...** opens a URL, branch and standard Windows folder chooser; **first saves its entry in ignored TOML and refreshes the GUI**, then attempts to clone into a named subfolder; errors remain visible in Activity log.
+- **File > Install Tools** checks dependencies and offers Git for Windows, GCM and optional GitHub CLI installations.
 - **File > GitHub Token...** includes a direct Create GitHub Token link and required permissions; it saves a masked token via Git Credential Manager in Windows Credential Manager (dedicated Dock namespace, never TOML).
 - The private `config.toml` is ignored by Git; tracked sample: [config.example.toml](config.example.toml).
 
@@ -84,3 +85,7 @@ GitHub CLI (gh) must be installed and authenticated using `gh auth login`. Publi
 ```
 
 The release script builds `distdock.exe`, generates a SHA-256 checksum and publishes both artifacts as a NEW GitHub release tagged with the app version. It refuses to overwrite an existing version. Use `-SkipBuild` only when the existing EXE was built from exactly the current source.
+
+## Install Tools compatibility
+
+**Git Credential Manager is not part of Windows itself.** It is normally bundled with Git for Windows, but `gh` is a separate optional program. Choose **File > Install Tools > Install Required** to check Git + GCM. The three individual actions are also available. On Windows 10/11, supported dependencies install with winget where available; otherwise official download pages open. On Windows 8.1/8, Dock directs you to compatible older Git and GCM releases instead of attempting current versions. No silent installation of obsolete packages is attempted. Windows 8.x operation of the Dock EXE itself has not been verified. See [tool support details](docs/DEVELOPMENT.md).

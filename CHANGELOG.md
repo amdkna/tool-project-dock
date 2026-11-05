@@ -2,6 +2,13 @@
 
 Version policy: `x.y.z`; x remains 0 until owner changes it, y remains 1 until owner changes it, and z increments on every published update (maximum 999).
 
+## [0.1.11] - 2026-11-05
+- Added File > Install Tools menu with actions for required tools (Git + GCM), Git for Windows, Git Credential Manager, and optional GitHub CLI.
+- Added scripts/install-tools.ps1 with prerequisite detection and Windows OS compatibility selection.
+- On Windows 8/8.1, opens compatible legacy Git/GCM release pages rather than installing unsupported modern versions.
+- On Windows 10/11, uses winget when available for Git and gh, otherwise official install pages.
+- Updated documentation and application version.
+
 ## [0.1.10] - 2026-11-05
 - Fixed Add New to persist repository settings in the ignored dist/config.toml before attempting Git clone.
 - Refreshes repository cards immediately after saving, so network/authentication failures no longer lose the new entry.

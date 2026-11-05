@@ -59,3 +59,11 @@ Run `update-now.bat` from the repository root (or absolute path). It uses `git r
 ## Fine-grained GitHub token permissions
 
 Within File > GitHub Token, choose **Create GitHub Token** to open https://github.com/settings/personal-access-tokens/new. Select the intended GitHub resource owner and limit access to only the desired repositories. For private repository pull and push, use **Repository permissions > Contents: Read and write**; GitHub automatically grants **Metadata: Read-only**. No administration, workflows or other permissions are required for ordinary Git push and pull (workflow changes may need additional permissions). Use a limited expiration and protect the Windows user profile.
+
+## Install Tools menu (v0.1.11)
+
+GCM is not built into Windows. It normally comes with Git for Windows when selected during setup. The optional `gh` utility is separately installed and is needed only for `scripts/release.ps1`.
+
+Open **File > Install Tools** and select Install Required, Git for Windows, Git Credential Manager, or GitHub CLI. The menu runs `scripts/install-tools.ps1` in a visible PowerShell window and skips detected installations. On Windows 10/11, Git and gh use winget if available; Git Credential Manager opens official standalone installer releases if missing. On Windows 8.1, Git 2.55.0(5) and GCM 2.9.x legacy releases are offered; on Windows 8, Git 2.46.2 and GCM 2.9.x are offered. GitHub CLI compatibility on Windows 8.x is not guaranteed and only its release archive is opened for manual selection. Windows 8.x versions are out of vendor support and should not be used for security-sensitive workloads. The Dock executable itself has not been tested on Windows 8.x and a binary built with a modern Go toolchain may require a newer Windows version.
+
+The application expects `scripts/install-tools.ps1` in the source checkout near the executable's `dist` directory. When distributing only `dock.exe`, include the `scripts` folder or install dependencies separately.
