@@ -20,7 +20,7 @@ cd 'C:\devs\Tools\dev\project-dock'
 .\scripts\build.ps1 -Run
 ```
 
-Compiles `dist/dock.exe`. First run creates `dist/config.toml`, which is gitignored.
+The build script uses `go run github.com/akavel/rsrc@latest` to compile `assets/dock.manifest` into a temporary `cmd/dock/rsrc_windows_amd64.syso`, which Go links into the Windows application. This is required by Walk's Common Controls v6 integration. The resource is removed in a finally block after the build. The first build needs network access for rsrc.\n\nCompiles `dist/dock.exe`. First run creates `dist/config.toml`, which is gitignored.
 
 ## Configuration
 

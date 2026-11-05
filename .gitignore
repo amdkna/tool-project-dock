@@ -5,3 +5,6 @@ config.toml
 dist/
 *.exe
 workspace/
+
+# Generated Windows resource; embed during builds only
+*.syso

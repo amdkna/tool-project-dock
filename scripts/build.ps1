@@ -10,6 +10,8 @@ $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $dist = Join-Path $root 'dist'
 $target = Join-Path $dist 'dock.exe'
+$manifest = Join-Path $root 'assets\dock.manifest'
+$resource = Join-Path $root 'cmd\dock\rsrc_windows_amd64.syso'
 
 if ($env:OS -ne 'Windows_NT') {
     throw 'This build script requires Windows.'
@@ -39,18 +41,32 @@ if (-not $goExe) {
 
 Push-Location $root
 try {
-    Write-Host '[1/4] Go version:' -ForegroundColor Cyan
+    Write-Host '[1/5] Go version:' -ForegroundColor Cyan
     & $goExe version
     if ($LASTEXITCODE -ne 0) { throw 'Unable to execute Go.' }
 
-    Write-Host '[2/4] Resolving Go dependencies...' -ForegroundColor Cyan
+    Write-Host '[2/5] Resolving Go dependencies...' -ForegroundColor Cyan
     & $goExe mod tidy
     if ($LASTEXITCODE -ne 0) { throw 'Go dependency resolution failed.' }
 
-    Write-Host '[3/4] Preparing output directory...' -ForegroundColor Cyan
+    Write-Host '[3/5] Preparing output directory...' -ForegroundColor Cyan
     New-Item -ItemType Directory -Path $dist -Force | Out-Null
 
-    Write-Host '[4/4] Building Windows GUI...' -ForegroundColor Cyan
+    if (-not (Test-Path -LiteralPath $manifest -PathType Leaf)) {
+        throw "Application manifest missing: $manifest"
+    }
+    if (Test-Path -LiteralPath $resource) {
+        throw "Unexpected existing resource file: $resource. Remove it after confirming it is not needed."
+    }
+
+    Write-Host '[4/5] Embedding Windows Common Controls v6 manifest...' -ForegroundColor Cyan
+    & $goExe run github.com/akavel/rsrc@latest -arch amd64 -manifest $manifest -o $resource
+    if ($LASTEXITCODE -ne 0) { throw 'Windows manifest resource generation failed.' }
+    if (-not (Test-Path -LiteralPath $resource -PathType Leaf)) {
+        throw 'Manifest resource generator returned success but did not create .syso.'
+    }
+
+    Write-Host '[5/5] Building Windows GUI...' -ForegroundColor Cyan
     & $goExe build -trimpath -ldflags '-H windowsgui' -o $target ./cmd/dock
     if ($LASTEXITCODE -ne 0) { throw 'Go build failed. Check compiler output above.' }
     if (-not (Test-Path -LiteralPath $target -PathType Leaf)) {
@@ -66,5 +82,10 @@ try {
     }
 }
 finally {
+    # The resource is generated inside the Go package only for compilation.
+    # Keep the repository clean and make every build regenerate the manifest.
+    if (Test-Path -LiteralPath $resource -PathType Leaf) {
+        Remove-Item -LiteralPath $resource -Force
+    }
     Pop-Location
 }

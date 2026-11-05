@@ -2,12 +2,12 @@
 
 **Pull. Run. Preview.**
 
-Lightweight portable Windows Git project utility. **Current version: ver. 0.1.5.**
+Lightweight portable Windows Git project utility. **Current version: ver. 0.1.6.**
 
 ## Current features
 
 - Native Go + Walk GUI.
-- File > Config..., File > Refresh, Info > ver. 0.1.5.
+- File > Config..., File > Refresh, Info > ver. 0.1.6.
 - Multiple repositories defined using TOML `[[repositories]]` blocks.
 - Compact bordered repository rows: PULL/PUSH buttons on the left, name and branch to the right.
 - File > Refresh reloads the TOML and updates rows, without restarting.
@@ -34,7 +34,7 @@ cd 'C:\devs\Tools\dev\project-dock'
 .\scripts\build.ps1 -Run
 ```
 
-The executable is written to `dist/dock.exe`. Its local configuration is `dist/config.toml`, generated if missing. Edit through **File > Config...**, then select **File > Refresh**.
+The build script generates a temporary Windows resource from `assets/dock.manifest` using `rsrc` and embeds Common Controls v6 into the executable to prevent Walk's `TTM_ADDTOOL failed` startup error. The temporary `.syso` is removed after compilation; the manifest itself remains tracked.\n\nThe executable is written to `dist/dock.exe`. Its local configuration is `dist/config.toml`, generated if missing. Edit through **File > Config...**, then select **File > Refresh**.
 
 ## Example config
 

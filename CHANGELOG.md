@@ -2,6 +2,12 @@
 
 Version policy: `x.y.z`; x remains 0 until owner changes it, y remains 1 until owner changes it, and z increments on every published update (maximum 999).
 
+## [0.1.6] - 2026-11-05
+- Fixed the Walk startup error `TTM_ADDTOOL failed` caused by a missing Windows Common Controls v6 application manifest.
+- Added `assets/dock.manifest` and resource embedding to `scripts/build.ps1` using rsrc.
+- Generated .syso resources are cleaned after builds; executable remains portable without a sidecar manifest.
+- Updated documentation and version label.
+
 ## [0.1.5] - 2026-11-05
 - Fixed build.ps1 failing to find Go when install.bat temporarily updated PATH but the calling PowerShell session still had an old PATH.
 - Build script resolves go.exe from common installation locations and uses its absolute path.
