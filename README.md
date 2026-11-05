@@ -2,17 +2,17 @@
 
 **Pull. Run. Preview.**
 
-Lightweight portable Windows Git project utility. **Current version: ver. 0.1.12.**
+Lightweight portable Windows Git project utility. **Current version: ver. 0.1.13.**
 
 ## Current features
 
 - Native Go + Walk GUI.
-- File > Config..., File > Refresh, Info > ver. 0.1.12.
+- File > Config..., File > Refresh, Info > ver. 0.1.13.
 - Multiple repositories defined using TOML `[[repositories]]` blocks.
 - Compact bordered repository rows: PULL/PUSH buttons on the left, name and branch to the right.
 - File > Refresh reloads the TOML and updates rows, without restarting.
 - Non-blocking Git operations with an activity log.
-- **Browse** button on each repository row opens Windows Explorer.
+- **Browse** button on each repository row opens Windows Explorer; **Git Repo** opens that repository's configured GitHub URL in the default browser.\n- **Info > Project Repo** opens https://github.com/amdkna/www-freelanceops in the default browser.
 - **Add New...** includes Test, Add, and an optional "Clone directly into selected folder" checkbox. Add clones (or verifies an existing clone), saves its entry in ignored TOML **only after success**, and refreshes the GUI. Test checks remote branch/read access and local destination.
 - **File > Install Tools** checks dependencies and offers Git for Windows, GCM and optional GitHub CLI installations.
 - **File > GitHub Token...** includes a direct Create GitHub Token link and required permissions; it saves a masked token via Git Credential Manager in Windows Credential Manager (dedicated Dock namespace, never TOML).

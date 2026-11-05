@@ -2,6 +2,7 @@ package main
 
 import (
  "fmt"
+ "net/url"
  "os"
  "os/exec"
  "path/filepath"
@@ -14,7 +15,7 @@ import (
  . "github.com/lxn/walk/declarative"
 )
 
-const version = "0.1.12"
+const version = "0.1.13"
 
 func main() {
  exe,err:=os.Executable()
@@ -85,6 +86,17 @@ func main() {
   }
  }
 
+ openGitHubURL:=func(raw string){
+  target,err:=url.Parse(strings.TrimSpace(raw))
+  if err!=nil || target==nil || target.Scheme!="https" || !strings.EqualFold(target.Hostname(),"github.com") || target.User!=nil || target.Port()!=""{
+   walk.MsgBox(mw,"Dock","Invalid GitHub repository URL.",walk.MsgBoxIconWarning)
+   return
+  }
+  if err:=exec.Command("rundll32.exe","url.dll,FileProtocolHandler",target.String()).Start();err!=nil{
+   walk.MsgBox(mw,"Dock","Could not open browser: "+err.Error(),walk.MsgBoxIconError)
+  }
+ }
+
  var refresh func()
 
  refresh=func(){
@@ -112,6 +124,10 @@ func main() {
    if err!=nil{logLine("[ERROR] Browse button: "+err.Error());return}
    explorer.SetText("Browse")
    explorer.Clicked().Attach(func(){openExplorer(repo)})
+   gitRepo,err:=walk.NewPushButton(box)
+   if err!=nil{logLine("[ERROR] Git Repo button: "+err.Error());return}
+   gitRepo.SetText("Git Repo")
+   gitRepo.Clicked().Attach(func(){openGitHubURL(repo.URL)})
    name,err:=walk.NewLabel(box)
    if err!=nil {logLine("[ERROR] Label: "+err.Error());return}
    name.SetText(repo.Name+"   |   "+repo.Branch)
@@ -228,6 +244,7 @@ func main() {
    }},
    Menu{Text:"&Info",Items:[]MenuItem{
     Action{Text:"ver. "+version,Enabled:false},
+    Action{Text:"Project &Repo",OnTriggered:func(){openGitHubURL("https://github.com/amdkna/www-freelanceops")}},
    }},
   },
   Children:[]Widget{

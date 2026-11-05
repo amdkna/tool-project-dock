@@ -2,6 +2,12 @@
 
 Version policy: `x.y.z`; x remains 0 until owner changes it, y remains 1 until owner changes it, and z increments on every published update (maximum 999).
 
+## [0.1.13] - 2026-11-05
+- Added Info > Project Repo opening https://github.com/amdkna/www-freelanceops in the default browser.
+- Added a Git Repo button to every repository row, opening its configured GitHub URL.
+- Validated GitHub HTTPS URLs before launching the browser.
+- Updated application version and documentation.
+
 ## [0.1.12] - 2026-11-05
 - Added Test button to Add New dialog to check GitHub branch read access and local destination.
 - Added checkbox to clone directly into chosen folder instead of chosen-folder/repo-name.

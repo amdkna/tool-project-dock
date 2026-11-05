@@ -73,3 +73,7 @@ The application expects `scripts/install-tools.ps1` in the source checkout near 
 Add New has a Test button next to Add; it checks the GitHub branch via git ls-remote and examines local destination safety. On private repositories, Git Credential Manager can request browser sign-in. Read access and branch existence are checked; write/push access cannot be verified without making an actual write. Uncheck "Clone directly into selected folder" to clone into selected-folder/repository-name. Check it to clone straight into the chosen folder. Existing folders must be empty or a matching Git checkout, never unrelated nonempty data. Clicking Add clones first, saves config.toml only on success and refreshes the UI. If clone fails, errors are logged and no invalid configuration entry is created.
 
 If an older Dock version already wrote an entry for a failed clone, use File > Config to remove or correct the old [[repositories]] block before adding again. The newer Add flow does not delete those existing entries automatically.
+
+## Repository browser shortcuts (v0.1.13)
+
+**Info > Project Repo** opens https://github.com/amdkna/www-freelanceops. Each configured repository row includes **Git Repo** next to Browse, opening the `url` field of that repository in the default browser. Only HTTPS GitHub URLs are accepted, and invalid links produce a warning.
