@@ -4,6 +4,23 @@
 **Current release baseline:** 1.0b (beta)  
 **Target:** 2.0
 
+## Updated direction: multi-language development operations
+
+**Dock is the controller, not the application runtime.** The user expects PHP, Python, Node.js, TypeScript, JavaScript, Go and other applications to run under their own runtimes or Docker, while Dock manages routing, HTTPS, process lifecycles and local CI/CD.
+
+The detailed system design is maintained in [VERSION-2.0-ARCHITECTURE.md](VERSION-2.0-ARCHITECTURE.md); implementation issues are linked in [V2-ISSUES.md](V2-ISSUES.md).
+
+### New priority: infrastructure modules
+
+| Module | Planned work | Exit criteria |
+|---|---|---|
+| Dock Agent | Background agent decoupled from GUI, authenticated loopback control API | GUI close does not interrupt proxy or local jobs |
+| HTTP/HTTPS Gateway | Loopback 80/443, host-based routes, reverse proxy/WebSockets, static hosting | Multiple language runtimes served under local hostnames |
+| Local SSL Issuer | Self-signed leaf and user-trusted local CA, SANs, expiry and rotation | Browser trust requires explicit user-approved CA install |
+| App Process Manager | Start/stop/restart, per-app ports/env/commands, logs, health | Python, PHP, Node, Go examples managed without bundling runtimes |
+| Docker Manager | Docker Engine client, container state/logs/metrics/actions | Works with available local/remote engine; no daemon bundled |
+| Mini CI/CD | TOML pipelines, local executor, SQLite run history, triggers and logs | Build/test/deploy/verify jobs run without Jenkins or hosted runner |
+
 ## Product goal
 
 Move Dock from a basic Git client to a lightweight Windows development workspace manager: understand the state of projects, commit safely, run them locally, and open previews without bundling a large development stack.

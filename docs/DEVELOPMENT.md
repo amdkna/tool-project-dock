@@ -85,3 +85,7 @@ Click PUSH on a repository row to open the commit-message dialog. Cancel exits w
 ## Update Now stops the old app (v0.1.15)
 
 After a successful fast-forward pull, `update-now.bat` compares Git HEAD before/after. Only for a changed commit, `scripts/stop-dock.ps1` locates `dock.exe` processes using the Win32_Process executable path, stops only instances from this source checkout's `dist\dock.exe`, and waits for exit. If unable to inspect or stop matching processes, updating aborts before rebuilding. When no new commit exists, it neither kills a running Dock nor builds. Stopping an in-progress Dock Git operation interrupts it; ensure ongoing operations are complete before updating.
+
+## Version 2.0 architecture planning (proposed)
+
+Read [VERSION-2.0-ARCHITECTURE.md](VERSION-2.0-ARCHITECTURE.md) for cross-language gateway, 127.0.0.1:80/443 reverse proxy, local certificate authority, app process manager, Docker API client, TOML/SQLite-backed local CI/CD, security constraints and sample pipeline schema. See [V2-ISSUES.md](V2-ISSUES.md) for implementation work items. This is future design, not 1.0b functionality.
