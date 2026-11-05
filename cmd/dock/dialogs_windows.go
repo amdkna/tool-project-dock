@@ -2,6 +2,7 @@ package main
 
 import (
  "fmt"
+ "os"
  "os/exec"
  "path/filepath"
  "strings"
@@ -11,42 +12,76 @@ import (
  . "github.com/lxn/walk/declarative"
 )
 
-// addRepositoryDialog asks for an HTTPS GitHub URL, branch and parent folder.
+// addRepositoryDialog chooses the exact destination or a repository subfolder.
+// Test checks URL, branch, credentials and destination before cloning.
 func addRepositoryDialog(owner *walk.MainWindow)(config.Repository,bool){
  var dlg *walk.Dialog
  var urlEdit,folderEdit,branchEdit *walk.LineEdit
+ var directCheck *walk.CheckBox
+ var testButton *walk.PushButton
  var result config.Repository
  var accepted bool
+
+ collect:=func()(config.Repository,error){
+  rawURL:=strings.TrimSpace(urlEdit.Text())
+  name,err:=config.GitHubName(rawURL)
+  if err!=nil{return config.Repository{},err}
+  folder:=strings.TrimSpace(folderEdit.Text())
+  branch:=strings.TrimSpace(branchEdit.Text())
+  if folder=="" || branch==""{return config.Repository{},fmt.Errorf("choose a local folder and enter a branch")}
+  info,err:=os.Stat(folder)
+  if err!=nil{return config.Repository{},fmt.Errorf("selected folder is not accessible: %w",err)}
+  if !info.IsDir(){return config.Repository{},fmt.Errorf("selected path must be a folder")}
+  destination:=folder
+  if !directCheck.Checked(){destination=filepath.Join(folder,name)}
+  return config.Repository{Name:name,URL:rawURL,Directory:filepath.Clean(destination),Branch:branch,Remote:"origin"},nil
+ }
+
  _,err:=(Dialog{
   AssignTo:&dlg,
   Title:"Add a GitHub repository",
-  MinSize:Size{Width:560,Height:250},
+  MinSize:Size{Width:620,Height:340},
   Layout:VBox{},
   Children:[]Widget{
    Label{Text:"GitHub HTTPS URL"},
    LineEdit{AssignTo:&urlEdit,Text:"https://github.com/owner/repository.git"},
-   Label{Text:"Local parent folder (Dock creates the repository subfolder)"},
+   Label{Text:"Local destination folder"},
    Composite{Layout:HBox{},Children:[]Widget{
     LineEdit{AssignTo:&folderEdit},
     PushButton{Text:"Browse...",OnClicked:func(){
-     chooser:=walk.FileDialog{Title:"Choose the parent folder for the repository"}
+     chooser:=walk.FileDialog{Title:"Select a local folder"}
      yes,err:=chooser.ShowBrowseFolder(dlg)
      if err!=nil{walk.MsgBox(dlg,"Folder chooser",err.Error(),walk.MsgBoxIconError);return}
      if yes{folderEdit.SetText(chooser.FilePath)}
     }},
    }},
+   CheckBox{AssignTo:&directCheck,Text:"Clone directly into selected folder (no repository subfolder)"},
+   Label{Text:"Unchecked: selected folder / repository name. Checked: selected folder itself."},
    Label{Text:"Branch"},
    LineEdit{AssignTo:&branchEdit,Text:"main"},
+   Label{Text:"Test verifies read access and destination. Push access requires an actual push."},
    Composite{Layout:HBox{},Children:[]Widget{
     HSpacer{},
+    PushButton{AssignTo:&testButton,Text:"Test",OnClicked:func(){
+     repo,err:=collect()
+     if err!=nil{walk.MsgBox(dlg,"Test - invalid details",err.Error(),walk.MsgBoxIconWarning);return}
+     testButton.SetEnabled(false)
+     go func(){
+      checkErr:=testRepository(repo)
+      dlg.Synchronize(func(){
+       testButton.SetEnabled(true)
+       if checkErr!=nil{
+        walk.MsgBox(dlg,"Repository test failed",checkErr.Error(),walk.MsgBoxIconWarning)
+       }else{
+        walk.MsgBox(dlg,"Repository test passed","GitHub branch is accessible and the local destination looks usable. Push authorization has not been tested.",walk.MsgBoxIconInformation)
+       }
+      })
+     }()
+    }},
     PushButton{Text:"Add",OnClicked:func(){
-     rawURL:=strings.TrimSpace(urlEdit.Text())
-     name,err:=config.GitHubName(rawURL)
-     if err!=nil{walk.MsgBox(dlg,"Invalid GitHub URL",err.Error(),walk.MsgBoxIconWarning);return}
-     folder:=strings.TrimSpace(folderEdit.Text())
-     branch:=strings.TrimSpace(branchEdit.Text())
-     if folder==""||branch==""{walk.MsgBox(dlg,"Missing information","Select a parent folder and enter a branch.",walk.MsgBoxIconWarning);return}
-     result=config.Repository{Name:name,URL:rawURL,Directory:filepath.Join(folder,name),Branch:branch,Remote:"origin"}
+     repo,err:=collect()
+     if err!=nil{walk.MsgBox(dlg,"Invalid repository",err.Error(),walk.MsgBoxIconWarning);return}
+     result=repo
      accepted=true
      dlg.Accept()
     }},

@@ -2,6 +2,14 @@
 
 Version policy: `x.y.z`; x remains 0 until owner changes it, y remains 1 until owner changes it, and z increments on every published update (maximum 999).
 
+## [0.1.12] - 2026-11-05
+- Added Test button to Add New dialog to check GitHub branch read access and local destination.
+- Added checkbox to clone directly into chosen folder instead of chosen-folder/repo-name.
+- Changed Add to clone first, save TOML only on success and refresh the list afterward.
+- Removed disabling terminal authentication for clone; Git Credential Manager can now request interactive sign-in.
+- Reused matching existing Git clones and supported empty selected destination folders.
+- Updated documentation and version.
+
 ## [0.1.11] - 2026-11-05
 - Added File > Install Tools menu with actions for required tools (Git + GCM), Git for Windows, Git Credential Manager, and optional GitHub CLI.
 - Added scripts/install-tools.ps1 with prerequisite detection and Windows OS compatibility selection.

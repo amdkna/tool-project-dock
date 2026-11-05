@@ -2,18 +2,18 @@
 
 **Pull. Run. Preview.**
 
-Lightweight portable Windows Git project utility. **Current version: ver. 0.1.11.**
+Lightweight portable Windows Git project utility. **Current version: ver. 0.1.12.**
 
 ## Current features
 
 - Native Go + Walk GUI.
-- File > Config..., File > Refresh, Info > ver. 0.1.11.
+- File > Config..., File > Refresh, Info > ver. 0.1.12.
 - Multiple repositories defined using TOML `[[repositories]]` blocks.
 - Compact bordered repository rows: PULL/PUSH buttons on the left, name and branch to the right.
 - File > Refresh reloads the TOML and updates rows, without restarting.
 - Non-blocking Git operations with an activity log.
 - **Browse** button on each repository row opens Windows Explorer.
-- **Add New...** opens a URL, branch and standard Windows folder chooser; **first saves its entry in ignored TOML and refreshes the GUI**, then attempts to clone into a named subfolder; errors remain visible in Activity log.
+- **Add New...** includes Test, Add, and an optional "Clone directly into selected folder" checkbox. Add clones (or verifies an existing clone), saves its entry in ignored TOML **only after success**, and refreshes the GUI. Test checks remote branch/read access and local destination.
 - **File > Install Tools** checks dependencies and offers Git for Windows, GCM and optional GitHub CLI installations.
 - **File > GitHub Token...** includes a direct Create GitHub Token link and required permissions; it saves a masked token via Git Credential Manager in Windows Credential Manager (dedicated Dock namespace, never TOML).
 - The private `config.toml` is ignored by Git; tracked sample: [config.example.toml](config.example.toml).
@@ -68,7 +68,7 @@ remote = "origin"
 
 Dock accepts directory = "C:\devs\test\" with single backslashes and a trailing slash. This is a Dock-specific convenience; literal TOML paths and properly escaped paths remain supported. All other fields follow standard TOML.
 
-Every repository needs name, URL, directory, branch; remote defaults to origin. Relative paths are relative to config.toml. Add New registers repositories before attempting to clone (so a network or credentials failure does not lose the entry), while rows already in TOML still expect their local directories to exist. The configured URL must match the local remote exactly. TOML contains no credentials.
+Every repository needs name, URL, directory, branch; remote defaults to origin. Relative paths are relative to config.toml. Add New clones (or verifies the existing clone) before saving a repository entry; if cloning fails, no broken entry is added, while rows already in TOML still expect their local directories to exist. The configured URL must match the local remote exactly. TOML contains no credentials.
 
 PULL uses `git pull --ff-only <remote> <branch>`. PUSH uses `git push <remote> <branch>` (already committed changes only). Neither force-pushes or automatically commits.
 

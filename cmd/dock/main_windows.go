@@ -14,7 +14,7 @@ import (
  . "github.com/lxn/walk/declarative"
 )
 
-const version = "0.1.11"
+const version = "0.1.12"
 
 func main() {
  exe,err:=os.Executable()
@@ -124,40 +124,58 @@ func main() {
   if busy.Load(){walk.MsgBox(mw,"Dock","Wait until the Git operation finishes.",walk.MsgBoxIconInformation);return}
   repo,ok:=addRepositoryDialog(mw)
   if !ok{return}
-  // Persist and display the new repository before cloning, so failed
-  // authentication/network operations never silently drop the new entry.
-  if err:=config.Add(configPath,repo);err!=nil{
-   walk.MsgBox(mw,"Cannot save project","Could not update config.toml: "+err.Error(),walk.MsgBoxIconError)
-   return
-  }
-  refresh()
-  logLine("[OK] Saved "+repo.Name+" in "+configPath)
   if !busy.CompareAndSwap(false,true){return}
   go func(){
    defer busy.Store(false)
-   // Folder picker selects a parent directory; clone to parent/repo-name.
-   if info,err:=os.Stat(repo.Directory);err==nil{
-    if !info.IsDir(){logLine("[ERROR] Target exists and is not a directory: "+repo.Directory);return}
-    check:=exec.Command("git","-C",repo.Directory,"rev-parse","--is-inside-work-tree")
-    if out,err:=check.Output();err!=nil||strings.TrimSpace(string(out))!="true"{
-     logLine("[ERROR] Target folder exists but is not a Git checkout: "+repo.Directory);return
-    }
-    remote:=exec.Command("git","-C",repo.Directory,"remote","get-url","origin")
-    remoteURL,err:=remote.Output()
-    if err!=nil||strings.TrimSpace(string(remoteURL))!=repo.URL{
-     logLine("[ERROR] Existing clone remote does not match supplied GitHub URL.");return
-    }
-   }else if !os.IsNotExist(err){
-    logLine("[ERROR] Could not inspect destination: "+err.Error());return
-   }else{
-    logLine("[CLONE] "+repo.Name+" -> "+repo.Directory)
-    cmd:=exec.Command("git","-c","credential.helper=","-c","credential.helper=manager","clone","--branch",repo.Branch,"--",repo.URL,repo.Directory)
-    cmd.Env=append(auth.Env(),"GIT_TERMINAL_PROMPT=0")
-    out,err:=cmd.CombinedOutput()
-    if err!=nil{logLine(fmt.Sprintf("[ERROR] Clone failed: %v %s",err,strings.TrimSpace(string(out))));return}
-    logLine("[OK] Clone finished: "+repo.Name)
+   logLine("[ADD] "+repo.Name+" -> "+repo.Directory)
+
+   if err:=checkDestination(repo);err!=nil{
+    logLine("[ERROR] Destination check failed: "+err.Error())
+    return
    }
-   logLine("[OK] Repository ready: "+repo.Name)
+   // Register only after clone succeeds. Never create broken cards on errors.
+   if _,err:=os.Stat(repo.Directory);os.IsNotExist(err){
+    cmd:=exec.Command("git","-c","credential.helper=","-c","credential.helper=manager",
+     "clone","--branch",repo.Branch,"--",repo.URL,repo.Directory)
+    cmd.Env=auth.Env() // GCM may open its browser authentication flow
+    logLine("[CLONE] Connecting to GitHub. Complete sign-in if prompted.")
+    out,err:=cmd.CombinedOutput()
+    if err!=nil{
+     logLine(fmt.Sprintf("[ERROR] Clone failed: %v\n%s",err,strings.TrimSpace(string(out))))
+     logLine("[INFO] Repository was not added to config.toml.")
+     return
+    }
+    logLine("[OK] Clone finished: "+repo.Name)
+   }else if err==nil{
+    gitRoot:=exec.Command("git","-C",repo.Directory,"rev-parse","--show-toplevel")
+    out,e:=gitRoot.Output()
+    if e!=nil{
+     // Existing empty folder is a valid clone destination.
+     cmd:=exec.Command("git","-c","credential.helper=","-c","credential.helper=manager",
+      "clone","--branch",repo.Branch,"--",repo.URL,repo.Directory)
+     cmd.Env=auth.Env()
+     cloneOutput,cloneErr:=cmd.CombinedOutput()
+     if cloneErr!=nil{
+      logLine(fmt.Sprintf("[ERROR] Clone failed: %v\n%s",cloneErr,strings.TrimSpace(string(cloneOutput))))
+      return
+     }
+     logLine("[OK] Clone finished: "+repo.Name)
+    }else if strings.TrimSpace(string(out))!=""{
+     logLine("[OK] Using existing matching clone: "+repo.Name)
+    }
+   }else{
+    logLine("[ERROR] Cannot inspect destination: "+err.Error())
+    return
+   }
+   if err:=config.Add(configPath,repo);err!=nil{
+    logLine("[ERROR] Clone is ready, but saving config.toml failed: "+err.Error())
+    return
+   }
+   logLine("[OK] Saved "+repo.Name+" in "+configPath)
+   mw.Synchronize(func(){
+    busy.Store(false)
+    refresh()
+   })
   }()
  }
 
