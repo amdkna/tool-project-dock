@@ -15,26 +15,43 @@ if ($env:OS -ne 'Windows_NT') {
     throw 'This build script requires Windows.'
 }
 
-$go = Get-Command go -ErrorAction SilentlyContinue
-if (-not $go) {
-    throw 'Go was not found in PATH. Install Go 1.22+ from https://go.dev/dl/ and reopen PowerShell.'
+# Batch files cannot update the PATH of their parent PowerShell session.
+# Resolve Go independently, including common Windows installation locations.
+$goCommand = Get-Command go.exe -ErrorAction SilentlyContinue
+$goExe = if ($goCommand) { $goCommand.Source } else { $null }
+
+if (-not $goExe) {
+    $candidates = @(
+        (Join-Path $env:ProgramFiles 'Go\bin\go.exe'),
+        (Join-Path $env:LOCALAPPDATA 'Programs\Go\bin\go.exe')
+    )
+    foreach ($candidate in $candidates) {
+        if (Test-Path -LiteralPath $candidate -PathType Leaf) {
+            $goExe = $candidate
+            $env:PATH = (Split-Path -Path $goExe -Parent) + ';' + $env:PATH
+            break
+        }
+    }
+}
+if (-not $goExe) {
+    throw 'Go was not found. Run install.bat or install Go from https://go.dev/dl/.'
 }
 
 Push-Location $root
 try {
     Write-Host '[1/4] Go version:' -ForegroundColor Cyan
-    & go version
+    & $goExe version
     if ($LASTEXITCODE -ne 0) { throw 'Unable to execute Go.' }
 
     Write-Host '[2/4] Resolving Go dependencies...' -ForegroundColor Cyan
-    & go mod tidy
+    & $goExe mod tidy
     if ($LASTEXITCODE -ne 0) { throw 'Go dependency resolution failed.' }
 
     Write-Host '[3/4] Preparing output directory...' -ForegroundColor Cyan
     New-Item -ItemType Directory -Path $dist -Force | Out-Null
 
     Write-Host '[4/4] Building Windows GUI...' -ForegroundColor Cyan
-    & go build -trimpath -ldflags '-H windowsgui' -o $target ./cmd/dock
+    & $goExe build -trimpath -ldflags '-H windowsgui' -o $target ./cmd/dock
     if ($LASTEXITCODE -ne 0) { throw 'Go build failed. Check compiler output above.' }
     if (-not (Test-Path -LiteralPath $target -PathType Leaf)) {
         throw 'Build reported success but dock.exe was not found.'

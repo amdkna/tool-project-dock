@@ -2,12 +2,12 @@
 
 **Pull. Run. Preview.**
 
-Lightweight portable Windows Git project utility. **Current version: ver. 0.1.4.**
+Lightweight portable Windows Git project utility. **Current version: ver. 0.1.5.**
 
 ## Current features
 
 - Native Go + Walk GUI.
-- File > Config..., File > Refresh, Info > ver. 0.1.4.
+- File > Config..., File > Refresh, Info > ver. 0.1.5.
 - Multiple repositories defined using TOML `[[repositories]]` blocks.
 - Compact bordered repository rows: PULL/PUSH buttons on the left, name and branch to the right.
 - File > Refresh reloads the TOML and updates rows, without restarting.
@@ -23,11 +23,11 @@ cd 'C:\devs\Tools\dev\project-dock'
 .\install.bat
 ```
 
-The installer checks Git, installs Go with winget only when missing, checks the effective PowerShell policy and uses `CurrentUser RemoteSigned` only when necessary, and safely fast-forward pulls `origin/main`. It stops if the working tree is dirty or the current branch is not main. An internet connection is needed to install Go and pull updates.
+The installer checks Git, installs Go with winget only when missing, makes Go discoverable in future terminals where necessary, checks the effective PowerShell policy and uses `CurrentUser RemoteSigned` only when necessary, and safely fast-forward pulls `origin/main`. It stops if the working tree is dirty or the current branch is not main. An internet connection is needed to install Go and pull updates.
 
 ## Build / launch (PowerShell)
 
-Requires Go 1.22+, Git for Windows and an internet connection for first-time Go dependencies.
+Requires Go 1.22+, Git for Windows and an internet connection for first-time Go dependencies. The build script now also finds Go in common installation directories even when the current PowerShell PATH is stale.
 
 ```powershell
 cd 'C:\devs\Tools\dev\project-dock'

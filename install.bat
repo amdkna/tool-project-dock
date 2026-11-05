@@ -52,6 +52,12 @@ if errorlevel 1 (
 )
 
 :go_ready
+rem Persist a user PATH entry only if neither user nor machine PATH contains Go.
+rem This helps new PowerShell sessions; the current parent shell cannot be modified.
+powershell.exe -NoProfile -NonInteractive -Command "$cmd=Get-Command go.exe -ErrorAction SilentlyContinue; if (-not $cmd) { $bins=@((Join-Path $env:ProgramFiles 'Go\bin'),(Join-Path $env:LOCALAPPDATA 'Programs\Go\bin')); foreach($bin in $bins) { if (Test-Path -LiteralPath (Join-Path $bin 'go.exe')) { $cmd=$bin; break } } }; if ($cmd) { $dir=if ($cmd -is [string]) { $cmd } else { Split-Path $cmd.Source -Parent }; $user=[Environment]::GetEnvironmentVariable('Path','User'); $machine=[Environment]::GetEnvironmentVariable('Path','Machine'); $all=(@($user,$machine) -join ';').Split(';') | ForEach-Object { $_.Trim().TrimEnd('\') }; if ($all -notcontains $dir.TrimEnd('\')) { [Environment]::SetEnvironmentVariable('Path',(($user.TrimEnd(';')+';'+$dir).TrimStart(';')),'User'); Write-Host 'Added Go to user PATH for future terminals.' } }"
+if errorlevel 1 (
+  echo [WARNING] Could not persist Go on PATH. The build script can still locate Go.
+)
 go version
 if errorlevel 1 (
   echo [ERROR] Go is installed but cannot run.

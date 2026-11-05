@@ -4,7 +4,7 @@
 
 Run `install.bat` from the repository root (or by absolute path). It checks Git, installs Go via winget if missing, allows local PowerShell scripts with `CurrentUser RemoteSigned` if required, and fast-forward pulls `main` if the working tree is clean.
 
-It deliberately does not bypass machine or organizational Group Policy. It does not force-pull, reset or discard uncommitted files. Go installation through winget may prompt for elevated privileges. It does not run the application build.
+If Go was found only by the installer, its installation directory is added to the persistent user PATH only when not already present in user or machine PATH. A running PowerShell session may have a stale PATH; the build script independently locates Go in common install folders and works without restarting PowerShell.\n\nIt deliberately does not bypass machine or organizational Group Policy. It does not force-pull, reset or discard uncommitted files. Go installation through winget may prompt for elevated privileges. It does not run the application build.
 
 ```powershell
 cd 'C:\devs\Tools\dev\project-dock'

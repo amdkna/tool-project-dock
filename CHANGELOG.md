@@ -2,6 +2,12 @@
 
 Version policy: `x.y.z`; x remains 0 until owner changes it, y remains 1 until owner changes it, and z increments on every published update (maximum 999).
 
+## [0.1.5] - 2026-11-05
+- Fixed build.ps1 failing to find Go when install.bat temporarily updated PATH but the calling PowerShell session still had an old PATH.
+- Build script resolves go.exe from common installation locations and uses its absolute path.
+- Installer adds Go to the user PATH for future terminals only when no existing user/machine PATH entry is present.
+- Updated setup documentation and version label.
+
 ## [0.1.4] - 2026-11-03
 - Added root `install.bat` to check and install Go (via winget) only if missing.
 - Added effective PowerShell execution policy check; applies CurrentUser RemoteSigned only when required.
